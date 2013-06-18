@@ -83,48 +83,40 @@ function setMatrixUniforms() {
 }
 
 var triangleVertexPositionBuffer;
-var squareVertexPositionBuffer;
-var octagonVertexPositionBuffer;
+var triangleVerticesIndexBuffer;
 
 function initBuffers() {
-    octagonVertexPositionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, octagonVertexPositionBuffer);
-    var vertices = [
-        0.5, 1.0, 0.0,
-        1.0, 0.5, 0.0,
-        1.0, -0.5, 0.0,
-        0.5, -1.0, 0.0,
-        -0.5, -1.0, 0.0,
-        -1.0, -0.5, 0.0,
-        -1.0, 0.5, 0.0,
-        -0.5, 1.0, 0.0
-    ]
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-    octagonVertexPositionBuffer.itemSize = 3;
-    octagonVertexPositionBuffer.numItems = 8;
-
     triangleVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
+
     var vertices = [
-        0.0,  1.0,  0.0,
+        //First Triangle
         -1.0, -1.0,  0.0,
-        1.0, -1.0,  0.0
+        0.0,  1.0,  0.0,
+        1.0, -1.0,  0.0,
+
+        //Second
+        2.0, 1.0, 0.0,
+
+        //Third
+        3.0, -1.0, 0.0
     ];
+
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
     triangleVertexPositionBuffer.itemSize = 3;
-    triangleVertexPositionBuffer.numItems = 3;
+    triangleVertexPositionBuffer.numItems = 5;
 
-    squareVertexPositionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
-    vertices = [
-        1.0,  1.0,  0.0,
-        -1.0,  1.0,  0.0,
-        1.0, -1.0,  0.0,
-        -1.0, -1.0,  0.0
+    triangleVerticesIndexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleVerticesIndexBuffer);
+
+    var triangleVertexIndices = [
+        0, 1, 2,
+        1, 2, 3,
+        2, 3, 4
     ];
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-    squareVertexPositionBuffer.itemSize = 3;
-    squareVertexPositionBuffer.numItems = 4;
+
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(triangleVertexIndices), gl.STATIC_DRAW);
+
 }
 
 
@@ -137,23 +129,13 @@ function drawScene() {
     mat4.identity(mvMatrix);
 
     mat4.translate(mvMatrix, [-1.5, 0.0, -7.0]);
+
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-    setMatrixUniforms();
-    gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems);
 
-
-    mat4.translate(mvMatrix, [3.0, 0.0, 0.0]);
-    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleVerticesIndexBuffer);
     setMatrixUniforms();
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
-
-    mat4.translate(mvMatrix, [3.0, 1.0, 0.0]);
-    gl.bindBuffer(gl.ARRAY_BUFFER, octagonVertexPositionBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, octagonVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-    setMatrixUniforms();
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, octagonVertexPositionBuffer.numItems);
+    gl.drawElements(gl.TRIANGLES, 9, gl.UNSIGNED_SHORT, 0);
 }
 
 
