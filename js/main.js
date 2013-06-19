@@ -72,6 +72,9 @@ function initShaders() {
     shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
     gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
 
+    shaderProgram.vertexStrokeAttribute = gl.getAttribLocation(shaderProgram, "aVertexStroke");
+    gl.enableVertexAttribArray(shaderProgram.vertexStrokeAttribute);
+
     shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
     shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
 }
@@ -173,12 +176,12 @@ function initBuffers() {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 
     //Vertex stroke
-    // triangleVertexStrokeBuffer = gl.createBuffer();
-    // gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexStrokeBuffer);
+    triangleVertexStrokeBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexStrokeBuffer);
 
-    // var bary = mesh.flatBary();
+    var bary = mesh.flatBary();
 
-    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bary), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bary), gl.STATIC_DRAW);
 
     //Triangle vertices
     triangleVerticesIndexBuffer = gl.createBuffer();
@@ -199,7 +202,7 @@ function drawScene() {
 
     mat4.identity(mvMatrix);
 
-    mat4.translate(mvMatrix, [-10, -5, -12.0]);
+    mat4.translate(mvMatrix, [-10, -5, -8.0]);
 
     mat4.rotate(mvMatrix, degToRad(-87), [1, 0, 0]);
 
@@ -209,12 +212,27 @@ function drawScene() {
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer);
     gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, mesh.colorWidth(), gl.FLOAT, false, 0, 0);
 
-    // gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexStrokeBuffer);
-    // gl.vertexAttribPointer(shaderProgram.vertexStrokeAttribute, 3, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexStrokeBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexStrokeAttribute, 3, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleVerticesIndexBuffer);
     setMatrixUniforms();
     gl.drawElements(gl.TRIANGLES, mesh.flatLength(), gl.UNSIGNED_SHORT, 0);
+}
+
+var firstTime = new Date().getTime();
+
+function animate() {
+    var timeNow = new Date().getTime();
+    mesh.update(timeNow-firstTime);
+}
+
+
+function tick() {
+    requestAnimFrame(tick);
+    initBuffers();
+    drawScene();
+    animate();
 }
 
 
@@ -229,5 +247,5 @@ function webGLStart() {
     gl.clearColor(236/255, 241/255, 235/255, 1.0);
     gl.enable(gl.DEPTH_TEST);
 
-    drawScene();
+    tick();
 }

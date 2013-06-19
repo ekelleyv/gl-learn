@@ -45,23 +45,21 @@ Mesh.prototype.getColor = function(index) {
 
 Mesh.prototype.flatVertices = function() {
 	var output = [];
-	for (var i = 0; i < this.vertices.length; i++) {
-		var vertex = this.vertices[i];
-		output.push(vertex.x);
-		output.push(vertex.y);
-		output.push(vertex.z);
-	}
+
+	this.vertices.forEach(function(vertex){
+		output = output.concat(vertex.flatten());
+	});
+	
 	return output;
 };
 
 Mesh.prototype.flatTriangles = function() {
 	var output = [];
-	for (var i = 0; i < this.triangles.length; i++) {
-		var triangle = this.triangles[i];
-		output.push(triangle.v0);
-		output.push(triangle.v1);
-		output.push(triangle.v2);
-	}
+	
+	this.triangles.forEach(function(triangle){
+		output = output.concat(triangle.flatten());
+	});
+
 	return output;
 };
 
@@ -122,4 +120,10 @@ Mesh.prototype.triangleWidth = function() {
 Mesh.prototype.print = function() {
 	console.log(this.vertices);
 	console.log(this.triangles);
+};
+
+Mesh.prototype.update = function(time) {
+	this.vertices.forEach(function(vertex) {
+		vertex.update(time);
+	});
 };
