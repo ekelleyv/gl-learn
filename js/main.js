@@ -235,12 +235,15 @@ function animate() {
 
 function tick() {
     requestAnimFrame(tick);
+    stat.new_frame();
     updateBuffers();
     drawScene();
     animate();
+    $('#log').html(stat.log());
 }
 
 
+var stat = new profiler();
 
 function webGLStart() {
     var canvas = document.getElementById("canvas");

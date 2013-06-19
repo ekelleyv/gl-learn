@@ -6,6 +6,11 @@
 
 <script type="text/javascript" src="js/glMatrix-0.9.5.min.js"></script>
 <script type="text/javascript" src="js/webgl-utils.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript" src="js/profiler.js"></script>
+
+<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="css/style.css">
 
 <script id="shader-fs" type="x-shader/x-fragment">
     precision mediump float;
@@ -23,6 +28,8 @@
         }
     }
 </script>
+
+
 
 <script id="shader-vs" type="x-shader/x-vertex">
     attribute vec3 aVertexPosition;
@@ -49,7 +56,12 @@
 
 
 <body onload="webGLStart();">
-    <canvas id="canvas" style="border: none;" width="500" height="500"></canvas>
+    <div style=" width:640px;height:480px;margin: 20px auto;">
+        <canvas id="canvas" width="640" height="480"></canvas>
+        <div id="no_rtc" class="alert alert-error" style="display:none;"></div>
+        <div id="log" class="alert alert-info"></div>
+    </div>
 </body>
+
 
 </html>
