@@ -4,7 +4,7 @@ function Vertex (x, y, z) {
 	this.z = z;
 
 	this.offset = Math.random()*2*Math.PI;
-	this.scale = Math.random()*.5;
+	this.scale = Math.random()*.4;
 
 }
 
@@ -13,5 +13,5 @@ Vertex.prototype.flatten = function() {
 };
 
 Vertex.prototype.update = function(t){
-	this.z = this.scale*Math.sin(this.offset + t/300);
+	this.z = this.scale*Math.sin(this.offset + t/150);
 }

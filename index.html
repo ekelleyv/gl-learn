@@ -14,10 +14,11 @@
 
     void main(void) {
         // gl_FragColor = vColor;
-        if(any(lessThan(vStroke, vec3(0.02)))){
+        if(any(lessThan(abs(vStroke), vec3(0.03)))){
             gl_FragColor = vec4(103.0/255.0, 187.0/255.0, 250.0/255.0, 1.0);
         }
         else{
+            gl_FragColor = vColor;
             gl_FragColor = vec4(152.0/255.0, 208.0/255.0, 250.0/255.0, 1.0);
         }
     }

@@ -99,7 +99,7 @@ var triangleVerticesIndexBuffer;
 var mesh;
 
 function initMesh() {
-    var width = 20;
+    var width = 25;
     mesh = new Mesh();
 
     // mesh.addColor(69/255, 209/255, 7/255, 1);
@@ -114,7 +114,7 @@ function initMesh() {
 
     for (var i = 0; i < width; i++) {
         for (var j = 0; j < width; j++) {
-            mesh.addVertex(new Vertex(i, j, Math.random()));
+            mesh.addVertex(new Vertex(i, j, 0));
         }
     }
     
@@ -123,34 +123,17 @@ function initMesh() {
     var tri_number = 0;
     for (var i = 0; i < cols; i++) {
         for (var j = 0; j < rows; j++) {
-            var tl = i*width + j;
-            var bl = tl+1;
+            var bl = i*width + j;
+            var tl = bl + 1;
             var tr = tl + width;
-            var br = tr + 1;
+            var br = bl + width;
 
             var c = tri_number%mesh.numColors();
             tri_number += 1;
 
-            if (i%2 == 0) {
-                if (j%2 == 0) {
-                    mesh.addTriangle(new Triangle(tl, tr, bl, c));
-                    mesh.addTriangle(new Triangle(tr, br, bl, c));
-                }
-                else {
-                    mesh.addTriangle(new Triangle(tl, tr, br, c));
-                    mesh.addTriangle(new Triangle(tl, br, bl, c));
-                }
-            }
-            else {
-                if (j%2 == 0) {
-                    mesh.addTriangle(new Triangle(tl, tr, br, c));
-                    mesh.addTriangle(new Triangle(tl, br, bl, c));
-                }
-                else {
-                    mesh.addTriangle(new Triangle(tl, tr, bl, c));
-                    mesh.addTriangle(new Triangle(tr, br, bl, c));
-                }
-            }
+            var i_even = (i%2==0) ? 1 : 0;
+            var j_even = (j%2==0) ? 1 : 0;
+            addTriangle(i_even^j_even, tl, bl, br, tr, c);
         }
     }
 
@@ -158,9 +141,33 @@ function initMesh() {
 
 }
 
+function addTriangle(type, tl, bl, br, tr, c) {
+    if (type == 0) {
+        mesh.addTriangle(new Triangle(tl, br, bl, c));
+        mesh.addTriangle(new Triangle(tl, tr, br, c));
+    }
+    else {
+        mesh.addTriangle(new Triangle(bl, tr, br, c));
+        mesh.addTriangle(new Triangle(tl, tr, bl, c));
+    }
+}
+
 function initBuffers() {
     //Vertex positions
     triangleVertexPositionBuffer = gl.createBuffer();
+
+    //Vertex colors
+    triangleVertexColorBuffer = gl.createBuffer();
+
+    //Vertex stroke
+    triangleVertexStrokeBuffer = gl.createBuffer();
+
+    //Triangle vertices
+    triangleVerticesIndexBuffer = gl.createBuffer();
+
+}
+
+function updateBuffers() {
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
 
     var vertices = mesh.flatVertices();
@@ -168,7 +175,6 @@ function initBuffers() {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
     //Vertex colors
-    triangleVertexColorBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer);
 
     var colors = mesh.flatColors();
@@ -176,7 +182,6 @@ function initBuffers() {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 
     //Vertex stroke
-    triangleVertexStrokeBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexStrokeBuffer);
 
     var bary = mesh.flatBary();
@@ -184,13 +189,11 @@ function initBuffers() {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bary), gl.STATIC_DRAW);
 
     //Triangle vertices
-    triangleVerticesIndexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleVerticesIndexBuffer);
 
     var triangleVertexIndices = mesh.flatTriangles();
 
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(triangleVertexIndices), gl.STATIC_DRAW);
-
 }
 
 
@@ -202,9 +205,11 @@ function drawScene() {
 
     mat4.identity(mvMatrix);
 
-    mat4.translate(mvMatrix, [-10, -5, -8.0]);
+    mat4.translate(mvMatrix, [-12, -5, -6.0]);
 
-    mat4.rotate(mvMatrix, degToRad(-87), [1, 0, 0]);
+    // mat4.translate(mvMatrix, [-3, -3, -10.0]);
+
+    mat4.rotate(mvMatrix, degToRad(-88), [1, 0, 0]);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, mesh.triangleWidth(), gl.FLOAT, false, 0, 0);
@@ -230,7 +235,7 @@ function animate() {
 
 function tick() {
     requestAnimFrame(tick);
-    initBuffers();
+    updateBuffers();
     drawScene();
     animate();
 }
